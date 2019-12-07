@@ -189,6 +189,9 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
     /**
      * 加载注册中心 URL 数组
      *
+     * [registry://127.0.0.1:2181/com.alibaba.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.0&logger=jcl&pid=34208&qos.port=22222&registry=zookeeper&timestamp=1571799599603,
+     * registry://127.0.0.1:6379/com.alibaba.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.0&logger=jcl&pid=34208&qos.port=22222&registry=redis&timestamp=1571799609641]
+     *
      * @param provider 是否是服务提供者
      * @return URL 数组
      */

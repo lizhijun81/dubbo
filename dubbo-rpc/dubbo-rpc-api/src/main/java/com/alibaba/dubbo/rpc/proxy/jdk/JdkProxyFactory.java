@@ -35,8 +35,10 @@ public class JdkProxyFactory extends AbstractProxyFactory {
         return (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), interfaces, new InvokerInvocationHandler(invoker));
     }
 
+    // 将服务 Service 包装成了 Invoker ，代理对象的回调，Invoker 对 Service 进行了代理
     public <T> Invoker<T> getInvoker(T proxy, Class<T> type, URL url) {
         return new AbstractProxyInvoker<T>(proxy, type, url) {
+            // proxy 就是具体的 ServiceImpl
             @Override
             protected Object doInvoke(T proxy, String methodName,
                                       Class<?>[] parameterTypes,

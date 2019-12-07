@@ -77,7 +77,7 @@ public abstract class AbstractProxyInvoker<T> implements Invoker<T> {
     }
 
     public Result invoke(Invocation invocation) throws RpcException {
-        try {
+        try {// 调用具体的ServiceImpl的方法，并且将 返回值封装成为 RpcResult 返回
             return new RpcResult(doInvoke(proxy, invocation.getMethodName(), invocation.getParameterTypes(), invocation.getArguments()));
         } catch (InvocationTargetException e) {
             return new RpcResult(e.getTargetException());

@@ -23,7 +23,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 /**
- * InvokerHandler
+ * InvokerHandler   jdk 动态代理 回调处理的 handler
  */
 public class InvokerInvocationHandler implements InvocationHandler {
 
@@ -54,7 +54,7 @@ public class InvokerInvocationHandler implements InvocationHandler {
         if ("equals".equals(methodName) && parameterTypes.length == 1) {
             return invoker.equals(args[0]);
         }
-        // RPC 调用
+        // 开始 RPC 调用
         return invoker.invoke(new RpcInvocation(method, args)).recreate();
     }
 

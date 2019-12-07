@@ -205,7 +205,7 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
         ExchangeChannel exchangeChannel = HeaderExchangeChannel.getOrAddChannel(channel);
         try {
             // 处理请求( Request )
-            if (message instanceof Request) {
+            if (message instanceof Request) {// 服务端响应客户端的请求
                 // handle request.
                 Request request = (Request) message;
                 // 处理事件请求
@@ -215,7 +215,7 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
                     // 处理普通请求
                     if (request.isTwoWay()) {
                         Response response = handleRequest(exchangeChannel, request);
-                        channel.send(response);
+                        channel.send(response);// 返回请求
                     // 提交给装饰的 `handler`，继续处理
                     } else {
                         handler.received(exchangeChannel, request.getData());

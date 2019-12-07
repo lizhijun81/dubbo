@@ -18,6 +18,10 @@ package com.alibaba.dubbo.common.utils;
 
 /**
  * Helper Class for hold a value.
+ *
+ * TODO
+ * Holder 这个类的作用是什么？？
+ * private volatile T value;
  */
 public class Holder<T> {
 

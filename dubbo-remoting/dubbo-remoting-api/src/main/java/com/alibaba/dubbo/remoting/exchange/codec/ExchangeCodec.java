@@ -258,16 +258,17 @@ public class ExchangeCodec extends TelnetCodec {
         // set request id.
         Bytes.long2bytes(req.getId(), header, 4);
 
+        // 先 将 request 序列化后写入到 buffer，之后 把 head 写入到 buffer
         // 编码 `Request.data` 到 Body ，并写入到 Buffer
         // encode request data.
         int savedWriteIndex = buffer.writerIndex();
-        buffer.writerIndex(savedWriteIndex + HEADER_LENGTH);
+        buffer.writerIndex(savedWriteIndex + HEADER_LENGTH);// 请求体 从到 buffer的  savedWriteIndex + head 的 长度后边 写入
         ChannelBufferOutputStream bos = new ChannelBufferOutputStream(buffer);
-        ObjectOutput out = serialization.serialize(channel.getUrl(), bos); // 序列化 Output
+        ObjectOutput out = serialization.serialize(channel.getUrl(), bos); // 序列化 Output ，
         if (req.isEvent()) {
             encodeEventData(channel, out, req.getData());
         } else {
-            encodeRequestData(channel, out, req.getData());
+            encodeRequestData(channel, out, req.getData());// 序列化 请求体， 并且 将
         }
         // 释放资源
         out.flushBuffer();
@@ -280,11 +281,11 @@ public class ExchangeCodec extends TelnetCodec {
         int len = bos.writtenBytes();
         checkPayload(channel, len);
         // `[96 - 127]`：Body 的**长度**。
-        Bytes.int2bytes(len, header, 12);
+        Bytes.int2bytes(len, header, 12);// 将 请求体的长度写入 head
 
         // 写入 Header 到 Buffer
         // write
-        buffer.writerIndex(savedWriteIndex);
+        buffer.writerIndex(savedWriteIndex);// buffer
         buffer.writeBytes(header); // write header.
         buffer.writerIndex(savedWriteIndex + HEADER_LENGTH + len);
     }

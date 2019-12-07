@@ -85,8 +85,11 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
     private final List<URL> urls = new ArrayList<URL>();
     // interface name
     private String interfaceName;
+
     /**
      * {@link #interfaceName} 对应的接口类
+     *
+     * Reference 真正代理的接口
      *
      * 非配置
      */
@@ -596,6 +599,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
         return interfaceName;
     }
 
+    // consumer.xml 中的 dubbo:reference 设置 的 interface，即 referenceBean 生成代理类 代理的接口
     public void setInterface(Class<?> interfaceClass) {
         if (interfaceClass != null && !interfaceClass.isInterface()) {
             throw new IllegalStateException("The interface class " + interfaceClass + " is not a interface!");

@@ -35,6 +35,13 @@ public class RandomLoadBalance extends AbstractLoadBalance {
 
     private final Random random = new Random();
 
+
+    /**
+     * 假设我们有一组服务器 servers = [A, B, C]，他们对应的权重为 weights = [5, 3, 2]，权重总和为10。
+     * 现在把这些权重值平铺在一维坐标值上，[0, 5) 区间属于服务器 A，[5, 8) 区间属于服务器 B，[8, 10) 区间属于服务器 C。
+     * 接下来通过随机数生成器生成一个范围在 [0, 10) 之间的随机数，然后计算这个随机数会落到哪个区间上。
+     * 比如数字3会落到服务器 A 对应的区间上，此时返回服务器 A 即可。
+     */
     @Override
     protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         int length = invokers.size(); // Number of invokers
@@ -55,6 +62,12 @@ public class RandomLoadBalance extends AbstractLoadBalance {
             int offset = random.nextInt(totalWeight);
             // Return a invoker based on the random value.
             // 区间判断
+            // 循环让 offset 数减去服务提供者权重值，当 offset 小于0时，返回相应的 Invoker。
+            // 举例说明一下，我们有 servers = [A, B, C]，weights = [5, 3, 2]，offset = 7。
+            // 第一次循环，offset - 5 = 2 > 0，即 offset > 5，
+            // 表明其不会落在服务器 A 对应的区间上。
+            // 第二次循环，offset - 3 = -1 < 0，即 5 < offset < 8，
+            // 表明其会落在服务器 B 对应的区间上
             for (Invoker<T> invoker : invokers) {
                 offset -= getWeight(invoker, invocation);
                 if (offset < 0) {

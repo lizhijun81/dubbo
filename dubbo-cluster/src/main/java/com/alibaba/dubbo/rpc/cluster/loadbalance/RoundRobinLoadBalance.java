@@ -82,7 +82,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
                         return k;
                     }
                     // 若 Invoker 还有权重值，扣除它( value )和剩余权重( mod )。
-                    if (v.getValue() > 0) {
+                    if (v.getValue() > 0) {// 在 依次判断 当前调用的次数在 哪个 Invoker 的权重域里边
                         v.decrement();
                         mod--;
                     }

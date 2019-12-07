@@ -51,8 +51,12 @@ public class NettyClient extends AbstractClient {
 
     private Bootstrap bootstrap;
 
+    // netty 的 NioSocketChannel
     private volatile io.netty.channel.Channel channel; // volatile, please copy reference to use
 
+    /**
+     * @see com.alibaba.dubbo.remoting.transport.ChannelHandlerDispatcher
+     */
     public NettyClient(final URL url, final ChannelHandler handler) throws RemotingException {
         super(url, wrapChannelHandler(url, handler));
     }
@@ -103,7 +107,7 @@ public class NettyClient extends AbstractClient {
     @SuppressWarnings("Duplicates")
     protected void doConnect() throws Throwable {
         long start = System.currentTimeMillis();
-        // 连接服务器
+        // 连接服务端
         ChannelFuture future = bootstrap.connect(getConnectAddress());
         try {
             // 等待连接成功或者超时

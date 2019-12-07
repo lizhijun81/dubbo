@@ -38,8 +38,14 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * FailbackClusterInvoker 会在调用失败后，返回一个空结果给服务提供者。并通过定时任务对失败的调用进行重传。
+ *
+ * 适合执行消息通知等操作。
+ *
  * When fails, record failure requests and schedule for retry on a regular interval.
  * Especially useful for services of notification.
+ *
+ * rpc 调用失败后，定时任务会重试
  *
  * <a href="http://en.wikipedia.org/wiki/Failback">Failback</a>
  */

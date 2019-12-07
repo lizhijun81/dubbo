@@ -49,6 +49,7 @@ public class Consumer {
                 demoService.sayHello("world");
 //                ProtocolConfig.destroyAll();
 
+                System.in.read();
                 Thread.sleep(10000000);
 //                demoService.say02();
 //                demoService.say03();

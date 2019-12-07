@@ -44,7 +44,7 @@ public interface Directory<T> extends Node {
     /**
      * list invokers.
      *
-     * 获得所有服务 Invoker 集合
+     * 获得 invocation 所有服务 Invoker 集合
      *
      * @return invokers
      */

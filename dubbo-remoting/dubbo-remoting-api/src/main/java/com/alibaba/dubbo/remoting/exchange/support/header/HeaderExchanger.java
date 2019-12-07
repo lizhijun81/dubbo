@@ -35,7 +35,7 @@ public class HeaderExchanger implements Exchanger {
     public static final String NAME = "header";
 
     @Override
-    public ExchangeClient connect(URL url, ExchangeHandler handler) throws RemotingException {
+    public ExchangeClient connect(URL url, ExchangeHandler handler) throws RemotingException {// 包装了所有的Handler
         return new HeaderExchangeClient(Transporters.connect(url, new DecodeHandler(new HeaderExchangeHandler(handler))), true);
     }
 

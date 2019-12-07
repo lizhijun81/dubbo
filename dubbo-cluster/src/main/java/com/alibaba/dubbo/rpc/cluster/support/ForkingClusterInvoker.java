@@ -36,6 +36,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ *
+ * 根据配置, 同时  发起fork个 并行 调用 Invoker , 有一个 线程返回则 整个 方法调用结束
+ *
  * Invoke a specific number of invokers concurrently, usually used for demanding real-time operations, but need to waste more service resources.
  *
  * <a href="http://en.wikipedia.org/wiki/Fork_(topology)">Fork</a>
@@ -96,7 +99,8 @@ public class ForkingClusterInvoker<T> extends AbstractClusterInvoker<T> {
                     } catch (Throwable e) {
                         // 异常计数器 + 1
                         int value = count.incrementAndGet();
-                        // 若 RPC 调结果都是异常，则添加异常到 `ref` 阻塞队列
+                        // 若 RPC 调结果都是异常，则添加异常到 `ref` 阻塞队列；
+                        // 只有最后一个 异常 被添加到 队列 进行返回
                         if (value >= selected.size()) {
                             ref.offer(e);
                         }

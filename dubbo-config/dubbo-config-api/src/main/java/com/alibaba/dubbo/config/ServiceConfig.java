@@ -125,7 +125,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
      * Service 对象
      */
     // reference to interface impl
-    private T ref;
+    private T ref;// 被代理的对象
     // service name
     private String path; // TODO 芋艿
     // method configuration
@@ -319,13 +319,13 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 module = provider.getModule();
             }
             if (registries == null) {
-                registries = provider.getRegistries();
+                registries = provider.getRegistries();// 注册中心
             }
             if (monitor == null) {
-                monitor = provider.getMonitor();
+                monitor = provider.getMonitor();// 监控中心
             }
             if (protocols == null) {
-                protocols = provider.getProtocols();
+                protocols = provider.getProtocols();// 协议
             }
         }
         // 从 ModuleConfig 对象中，读取 registries、monitor 配置对象。
@@ -365,6 +365,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             checkRef();
             generic = Boolean.FALSE.toString();
         }
+
         // 处理服务接口客户端本地代理( `local` )相关。实际目前已经废弃，使用 `stub` 属性，参见 `AbstractInterfaceConfig#setLocal` 方法。
         if (local != null) {
             // 设为 true，表示使用缺省代理类名，即：接口名 + Local 后缀
@@ -381,6 +382,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 throw new IllegalStateException("The local implementation class " + localClass.getName() + " not implement interface " + interfaceName);
             }
         }
+
         // 处理服务接口客户端本地代理( `stub` )相关
         if (stub != null) {
             // 设为 true，表示使用缺省代理类名，即：接口名 + Stub 后缀
@@ -397,6 +399,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 throw new IllegalStateException("The stub implementation class " + stubClass.getName() + " not implement interface " + interfaceName);
             }
         }
+
         // 校验 ApplicationConfig 配置。
         checkApplication();
         // 校验 RegistryConfig 配置。
@@ -411,6 +414,8 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         if (path == null || path.length() == 0) {
             path = interfaceName;
         }
+
+        // 多协议多注册中心导出服务
         // 暴露服务
         doExportUrls();
         // TODO 芋艿，等待 qos
@@ -489,6 +494,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         if (ConfigUtils.getPid() > 0) {
             map.put(Constants.PID_KEY, String.valueOf(ConfigUtils.getPid()));
         }
+        // 通过反射 从 config 中获取 相应的属性放入 map 中，相同的属性之间相互覆盖
         // 将各种配置对象，添加到 `map` 集合中。
         appendParameters(map, application);
         appendParameters(map, module);
@@ -496,6 +502,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         appendParameters(map, protocolConfig);
         appendParameters(map, this);
         // 将 MethodConfig 对象数组，添加到 `map` 集合中。
+        // 针对方法的相关配置
         if (methods != null && !methods.isEmpty()) {
             for (MethodConfig method : methods) {
                 // 将 MethodConfig 对象，添加到 `map` 集合中。
@@ -520,8 +527,8 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                                 for (int i = 0; i < methods.length; i++) {
                                     String methodName = methods[i].getName();
                                     // target the method, and get its signature
-                                    if (methodName.equals(method.getName())) { // 找到指定方法
-                                        Class<?>[] argTypes = methods[i].getParameterTypes();
+                                    if (methodName.equals(method.getName())) { // 找到接口中指定的方法
+                                        Class<?>[] argTypes = methods[i].getParameterTypes();// 获取接口中的方法参数类型
                                         // one callback in the method
                                         if (argument.getIndex() != -1) { // 指定单个参数的位置 + 类型
                                             if (argTypes[argument.getIndex()].getName().equals(argument.getType())) {
@@ -534,7 +541,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                                             // multiple callbacks in the method
                                             for (int j = 0; j < argTypes.length; j++) {
                                                 Class<?> argClazz = argTypes[j];
-                                                if (argClazz.getName().equals(argument.getType())) {
+                                                if (argClazz.getName().equals(argument.getType())) {// 查找到 相同方法的相同参数进行设置
                                                     // 将 ArgumentConfig 对象，添加到 `map` 集合中。
                                                     appendParameters(map, argument, method.getName() + "." + j); // `${methodName}.${index}`
                                                     if (argument.getIndex() != -1 && argument.getIndex() != j) { // 多余的判断，因为 `argument.getIndex() == -1` 。
@@ -637,13 +644,14 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                             logger.info("Register dubbo service " + interfaceClass.getName() + " url " + url + " to registry " + registryURL);
                         }
                         // 使用 ProxyFactory 创建 Invoker 对象
+                        // ref 为 远程暴露的对象 即 被代理的对象 registry://127.0.0.1:2181/com.alibaba.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.0&export=dubbo%3A%2F%2F10.115.16.87%3A20880%2Fcom.alibaba.dubbo.demo.DemoService%3Faccesslog%3Dtrue%26anyhost%3Dtrue%26application%3Ddemo-provider%26bind.ip%3D10.115.16.87%26bind.port%3D20880%26callbacks%3D1000%26default.delay%3D-1%26default.proxy%3Djdk%26default.retries%3D0%26delay%3D-1%26deprecated%3Dfalse%26dubbo%3D2.0.0%26generic%3Dfalse%26group%3Dg1%26interface%3Dcom.alibaba.dubbo.demo.DemoService%26logger%3Djcl%26methods%3DcallbackParam%2CsayHello%2Csave%2Cupdate%2Csay03%2Cdelete%2Csay04%2Cdemo%2Csay01%2Cbye%2Csay02%2Chello02%2Csaves%2Chello01%2Chello%26pid%3D36625%26qos.port%3D22222%26say01.deprecated%3Dtrue%26server%3Dnetty4%26service.filter%3Ddemo%26side%3Dprovider%26timeout%3D200000%26timestamp%3D1571814220310&logger=jcl&pid=36625&qos.port=22222&registry=zookeeper&timestamp=1571814210273
                         Invoker<?> invoker = proxyFactory.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(Constants.EXPORT_KEY, url.toFullString()));
 
                         // 创建 DelegateProviderMetaDataInvoker 对象
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
 
-                        // 使用 Protocol 暴露 Invoker 对象
-                        Exporter<?> exporter = protocol.export(wrapperInvoker);
+                        // 使用 Protocol 暴露 Invoker 对象 registry://127.0.0.1:2181/com.alibaba.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.0&export=dubbo%3A%2F%2F10.115.16.87%3A20880%2Fcom.alibaba.dubbo.demo.DemoService%3Faccesslog%3Dtrue%26anyhost%3Dtrue%26application%3Ddemo-provider%26bind.ip%3D10.115.16.87%26bind.port%3D20880%26callbacks%3D1000%26default.delay%3D-1%26default.proxy%3Djdk%26default.retries%3D0%26delay%3D-1%26deprecated%3Dfalse%26dubbo%3D2.0.0%26generic%3Dfalse%26group%3Dg1%26interface%3Dcom.alibaba.dubbo.demo.DemoService%26logger%3Djcl%26methods%3DcallbackParam%2CsayHello%2Csave%2Cupdate%2Csay03%2Cdelete%2Csay04%2Cdemo%2Csay01%2Cbye%2Csay02%2Chello02%2Csaves%2Chello01%2Chello%26pid%3D36625%26qos.port%3D22222%26say01.deprecated%3Dtrue%26server%3Dnetty4%26service.filter%3Ddemo%26side%3Dprovider%26timeout%3D200000%26timestamp%3D1571814220310&logger=jcl&pid=36625&qos.port=22222&registry=zookeeper&timestamp=1571814210273
+                        Exporter<?> exporter = protocol.export(wrapperInvoker);// 通过 registryProtocol 将 wrapperInvoker 暴露给 到 注册中心
                         // 添加到 `exporters`
                         exporters.add(exporter);
                     }

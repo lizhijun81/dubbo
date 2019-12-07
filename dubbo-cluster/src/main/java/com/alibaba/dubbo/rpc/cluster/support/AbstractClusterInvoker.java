@@ -122,7 +122,8 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
      * @param invokers    invoker candidates
      *                    候选的 Invoker 集合
      * @param selected    exclude selected invokers or not
-     *                    已选过的 Invoker 集合. 注意：输入保证不重复
+     *                    已选过的 Invoker 集合. 注意：输入保证不重复；
+     *                    FailoverInvoker 时，保证重试时，采用不同的 Invoker
      * @return 最终的 Invoker 对象
      * @throws RpcException 当发生 RpcException 时
      */
@@ -182,6 +183,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
                 || (!invoker.isAvailable() && getUrl() != null && availablecheck)) {
             try {
                 //【第四种】重选一个 Invoker 对象
+                // 如果 selected 包含负载均衡选择出的 Invoker，或者该 Invoker 无法经过可用性检查，此时进行重选
                 Invoker<T> rinvoker = reselect(loadbalance, invocation, invokers, selected, availablecheck);
                 if (rinvoker != null) {
                     invoker = rinvoker;
@@ -223,6 +225,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
 
         // First, try picking a invoker not in `selected`.
         // 先从非select中选
+        // 查询到非 selected 且 有存活的 中的 invokers，然后通过 负载均衡 选择一个新的 invoker
         if (availablecheck) { // invoker.isAvailable() should be checked
             // 获得非选择过，并且可用的 Invoker 集合
             for (Invoker<T> invoker : invokers) {
@@ -237,6 +240,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
                 return loadbalance.select(reselectInvokers, getUrl(), invocation);
             }
         } else { // do not check invoker.isAvailable()
+            // 查询到非 selected 的 invokers，然后通过 负载均衡 选择一个新的 invoker
             // 获得非选择过的 Invoker 集合
             for (Invoker<T> invoker : invokers) {
                 if (selected == null || !selected.contains(invoker)) {
@@ -250,7 +254,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
         }
         // Just pick an available invoker using loadbalance policy
         // 最后从select中选可用的.
-        {
+        {// 走到该处，表名 所有的 Invokers 都在 selected 中，则从 selected 选择一个 Invoker
             // 获得选择过的，并且可用的 Invoker 集合
             if (selected != null) {
                 for (Invoker<T> invoker : selected) {

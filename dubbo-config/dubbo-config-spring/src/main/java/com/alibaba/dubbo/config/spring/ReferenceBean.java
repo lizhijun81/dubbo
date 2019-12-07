@@ -38,7 +38,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ReferenceFactoryBean
+ *
+ * ReferenceFactoryBean 是 spring 中的 FactoryBean，在 spring refresh() 中 将回调 getObject() 方法 创建 实例
  *
  * @export
  */
@@ -61,6 +62,11 @@ public class ReferenceBean<T> extends ReferenceConfig<T> implements FactoryBean,
         SpringExtensionFactory.addApplicationContext(applicationContext);
     }
 
+    /**
+     * Spring factoryBean 的工厂方法
+     * @return
+     * @throws Exception
+     */
     @Override
     public Object getObject() throws Exception {
         return get();

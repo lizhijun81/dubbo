@@ -31,10 +31,14 @@ import java.util.List;
  */
 public abstract class AbstractLoadBalance implements LoadBalance {
 
+    /**
+     * 保证当服务运行时长小于服务预热时间时，对服务进行降权，避免让服务在启动之初就处于高负载状态。
+     * 服务预热是一个优化手段，与此类似的还有 JVM 预热。主要目的是让服务启动后“低功率”运行一段时间，使其效率慢慢提升至最佳状态。
+     */
     static int calculateWarmupWeight(int uptime, int warmup, int weight) {
         // 计算权重
-        int ww = (int) ((float) uptime / ((float) warmup / (float) weight));
-        // 权重范围为 [0, weight] 之间
+        int ww = (int) ((float) uptime / ((float) warmup / (float) weight)); // [(uptime / warmup) * weight]
+        // 权重范围为 [1, weight] 之间
         return ww < 1 ? 1 : (ww > weight ? weight : ww);
     }
 

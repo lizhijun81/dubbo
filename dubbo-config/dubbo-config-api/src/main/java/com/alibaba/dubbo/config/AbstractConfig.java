@@ -253,13 +253,13 @@ public abstract class AbstractConfig implements Serializable {
                         && !"getClass".equals(name)
                         && Modifier.isPublic(method.getModifiers())
                         && method.getParameterTypes().length == 0
-                        && isPrimitive(method.getReturnType())) { // 方法为获取基本类型，public 的 getting 方法。
+                        && isPrimitive(method.getReturnType())) { // 方法的返回值为基本类型；方法为获取基本类型，public 的 getting 方法。
                     Parameter parameter = method.getAnnotation(Parameter.class);
                     if (method.getReturnType() == Object.class || parameter != null && parameter.excluded()) {
                         continue;
                     }
                     // 获得属性名
-                    int i = name.startsWith("get") ? 3 : 2;
+                    int i = name.startsWith("get") ? 3 : 2;// is 开头=2；get开头=3
                     String prop = StringUtils.camelToSplitName(name.substring(i, i + 1).toLowerCase() + name.substring(i + 1), ".");
                     String key;
                     if (parameter != null && parameter.key() != null && parameter.key().length() > 0) {
@@ -289,7 +289,7 @@ public abstract class AbstractConfig implements Serializable {
                         if (prefix != null && prefix.length() > 0) {
                             key = prefix + "." + key;
                         }
-                        parameters.put(key, str);
+                        parameters.put(key, str);// 通过反射 从 config 中获取 相应的属性放入 map 中，相同的属性之间相互覆盖
 //                        System.out.println("kv:" + key + "\t" + str);
                     } else if (parameter != null && parameter.required()) {
                         throw new IllegalStateException(config.getClass().getSimpleName() + "." + key + " == null");

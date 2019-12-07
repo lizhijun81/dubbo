@@ -28,6 +28,9 @@ import com.alibaba.dubbo.rpc.cluster.LoadBalance;
 import java.util.List;
 
 /**
+ * fail-fast  快速失败
+ * FailfastClusterInvoker 只会进行一次调用，失败后立即抛出异常。适用于幂等操作，比如新增记录。
+ *
  * Execute exactly once, which means this policy will throw an exception immediately in case of an invocation error.
  * Usually used for non-idempotent write operations
  *

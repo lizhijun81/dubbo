@@ -514,7 +514,7 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
     }
 
     public BeanDefinition parse(Element element, ParserContext parserContext) {
-        return parse(element, parserContext, beanClass, required);
+        return parse(element, parserContext, beanClass, required);// 将 xml 中 配置的真实的class替换成了Parser处理的class
     }
 
 }

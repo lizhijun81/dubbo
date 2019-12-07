@@ -26,8 +26,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * 最少活跃数：
+ *      活跃数不相等：选取最少活跃数的 Invoker
+ *      相同活跃数： 按权重随机选取 Invoker
  * LeastActiveLoadBalance
- * <p>
  * 最少活跃调用数，相同活跃数的随机，活跃数指调用前后计数差。
  * 使慢的提供者收到更少请求，因为越慢的提供者的调用前后计数差会越大。
  */
@@ -67,11 +69,14 @@ public class LeastActiveLoadBalance extends AbstractLoadBalance {
                 }
             }
         }
+
         // assert(leastCount > 0)
         if (leastCount == 1) {
             // 如果只有一个最小则直接返回
             return invokers.get(leastIndexes[0]);
         }
+
+        // 多个 活跃数量相等的 Invoker，但是权重不相等
         if (!sameWeight && totalWeight > 0) {
             // 如果权重不相同且权重大于0则按总权重数随机
             int offsetWeight = random.nextInt(totalWeight);
@@ -84,6 +89,8 @@ public class LeastActiveLoadBalance extends AbstractLoadBalance {
                 }
             }
         }
+
+        // 多个 活跃数量相等的 Invoker，权重相等，随机选取一个
         // 如果权重相同或权重为0则均等随机
         return invokers.get(leastIndexes[random.nextInt(leastCount)]);
     }

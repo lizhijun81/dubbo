@@ -26,7 +26,7 @@ import com.alibaba.dubbo.rpc.cluster.support.FailoverCluster;
  * Cluster. (SPI, Singleton, ThreadSafe)
  *
  * 集群接口
- *
+ * 集群调用 远程接口
  * <p>
  * <a href="http://en.wikipedia.org/wiki/Computer_cluster">Cluster</a>
  * <a href="http://en.wikipedia.org/wiki/Fault-tolerant_system">Fault-Tolerant</a>
